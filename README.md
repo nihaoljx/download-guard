@@ -1,275 +1,268 @@
-# Download Guard
+<div align="center">
 
-> **AI Agent download guard for Windows.** Transparent locations, no C-drive fill-up, auto log cleanup.
+# 🛡️ Download Guard
+
+**AI Agent 下载管理 — 位置透明 · C盘保护 · 自动清理**
 
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue)](https://github.com)
 [![License: MIT-0](https://img.shields.io/badge/license-MIT--0-green)](LICENSE)
 [![Version: 5.4.0](https://img.shields.io/badge/version-5.4.0-orange)](CHANGELOG.md)
 
----
-
-## The Problem
-
-When you give an AI coding agent (Claude Code, Cursor, etc.) permission to install packages and download files, you lose visibility into **where things go**. Common pain points:
-
-- 🤷 **"Where did it download?"** — Agent silently installs to C: drive, you have no idea
-- 💥 **C: drive fills up** — Large models (2-14 GB each), npm global packages, pip caches all pile up on C:
-- 🔄 **Repeated downloads** — Agent re-downloads the same model/dataset because it forgot where it put it
-- 🗑️ **Invisible garbage** — Log files, caches, and temp files accumulate forever with no cleanup
-- ⚠️ **Broken PATH** — After moving npm prefix or conda envs, commands stop working
-- 💿 **Drive disconnected** — Your download directory is on an external drive that got unplugged, Agent silently falls back to C:
-
-**Download Guard fixes all of this.**
+</div>
 
 ---
 
-## What It Does For You
+## 😩 你是不是也遇到过这些问题？
 
-| Problem | How Download Guard Helps |
-|---------|------------------------|
-| Don't know where files went | **Every download tells you exactly where it went** — filename, path, disk health status |
-| C: drive fills up | **Downloads go to your configured directory** (not C:), with space checks before every download |
-| Drive disconnected or path broken | **BLOCKS the download instead of silently falling back to C:** — you get a clear error message |
-| Repeated downloads | **Detects if the file already exists** in your download directory and asks before re-downloading |
-| Garbage accumulation | **Auto-archives old log entries** after 30 days, deletes oversized archives |
-| Broken PATH after migration | **Checks PATH alignment** when changing npm prefix/conda envs, warns about spaces in tool paths |
-| Tool caches on C: | **Scans npm/pip/conda/cargo/go/uv/pnpm caches** and offers one-click migration |
-| Large downloads surprise | **Warns if download size > 50% of free space**, blocks if it exceeds free space |
-| venv vs global pip | **Recognizes active virtual environments** — `pip install` inside venv doesn't trigger |
+> 用 AI Agent（Claude Code、Cursor 等）装东西，装完不知道去哪了……
 
----
+| 痛点 | 场景 |
+|------|------|
+| 🤷 **"刚才下的东西去哪了？"** | Agent 默默装到 C 盘，你完全不知道 |
+| 💥 **C 盘又红了** | 大模型 2-14 GB、npm 全局包、pip 缓存全堆在 C 盘 |
+| 🔄 **重复下载** | Agent 忘了之前下过，又下一遍 |
+| 🗑️ **垃圾越来越多** | 日志、缓存、临时文件只增不减 |
+| 💿 **外接盘拔了** | 下载目录不可用，Agent 静默切回 C 盘 |
+| ⚠️ **装完用不了** | 改了 npm prefix 后命令找不到了 |
 
-## How It Works — The Flow
-
-### When you trigger a download (or the Agent does)
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Download Guard Flow                               │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  1. READ CONFIG                                                     │
-│     └─ Read config.md → Get DOWNLOAD_ROOT                           │
-│     └─ If SETUP_DONE = false → Run first-time setup                │
-│     └─ Verify config integrity                                      │
-│                                                                      │
-│  2. CLASSIFY PATH TYPE                                              │
-│     └─ Type A (cache) → Safe to redirect (pip cache, npm cache)   │
-│     └─ Type B (install dir) → Must sync PATH (npm prefix, cargo)  │
-│     └─ Type C (file storage) → Safe to redirect (git clone, wget)  │
-│                                                                      │
-│  3. DUPLICATE CHECK                                                 │
-│     └─ Scan DOWNLOAD_ROOT for similar files                         │
-│     └─ If found → Ask user: "Already exists. Download again?"      │
-│                                                                      │
-│  4. PATH AVAILABILITY + SPACE CHECK                                 │
-│     └─ Drive exists? → No → BLOCK (exit 2, no C: fallback)        │
-│     └─ Path writable? → No → BLOCK                                 │
-│     └─ Path missing? → Auto-create if drive is valid               │
-│     └─ Space check → Below minimum? → BLOCK                        │
-│     └─ Size awareness → > 50% free space? → WARN                   │
-│                                                                      │
-│  5. INFORM USER                                                     │
-│     └─ "准备下载: {file} → {path} | Disk: {X}GB free [OK]"       │
-│                                                                      │
-│  6. EXECUTE DOWNLOAD                                                │
-│                                                                      │
-│  7. VERIFY + LOG + INFORM                                           │
-│     └─ Verify file exists at expected path                          │
-│     └─ Log to download-log.md (with auto-cleanup)                   │
-│     └─ "完成: {file} → {path}"                                     │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-### Daily first trigger — environment report
-
-The first time each day the skill activates, it shows an environment report:
-
-```
-[DOWNLOAD GUARD] Today's first check · Environment Report
-Download dir  : D:\AI-Downloads  (132 GB available)
-Path available: OK
-C: drive      : 58 GB available  [OK]
-Tool caches   : All OK / 2 items on C: [WARN]
-Log entries   : 47 entries
-```
-
-If the download directory is unavailable → **immediately alerts you**.
+**Download Guard = 上面这些问题的解药。**
 
 ---
 
-## Quick Start
+## ✨ 装了之后会怎样？
 
-### Installation
+### 每次下载，你都会看到这样的提示：
 
-**Option A: From ClawHub** (recommended)
+```
+┌──────────────────────────────────────────────┐
+│  🛡️ Download Guard                           │
+│                                               │
+│  📦 文件     : pytorch-2.3.0.whl              │
+│  📏 大小     : 2.1 GB                         │
+│  📂 写入至   : F:\AI-Downloads\2026-05-26\    │
+│  💾 目标盘   : 132 GB 可用  ✅ OK              │
+│  💿 C 盘     : 58 GB 可用   ✅ OK              │
+│  🔒 路径可用 : ✅ OK                           │
+│                                               │
+│  ▶ 继续执行...                                │
+└──────────────────────────────────────────────┘
+```
+
+### 下载完成，还会验证 + 记录：
+
+```
+┌──────────────────────────────────────────────┐
+│  ✅ Download Guard · 完成                     │
+│                                               │
+│  📦 文件   : pytorch-2.3.0.whl  (2.1 GB)      │
+│  📍 位置   : F:\AI-Downloads\2026-05-26\      │
+│  📝 已记录 : download-log.md                  │
+└──────────────────────────────────────────────┘
+```
+
+### 每天第一次触发，自动出环境报告：
+
+```
+┌──────────────────────────────────────────────┐
+│  🛡️ Download Guard · 今日首次 · 环境快报       │
+│                                               │
+│  📂 下载目录   : F:\AI-Downloads (132 GB)      │
+│  🔒 路径可用   : ✅ OK                         │
+│  💿 C 盘       : 58 GB ✅ OK                   │
+│  🗄️ 工具缓存   : 全部 OK                      │
+│  📝 日志条数   : 47 条                         │
+└──────────────────────────────────────────────┘
+```
+
+### 如果下载目录不可用（盘拔了/路径坏了）：
+
+```
+┌──────────────────────────────────────────────┐
+│  🚫 Download Guard · BLOCKED                  │
+│                                               │
+│  ❌ 路径不可用 : F:\AI-Downloads               │
+│  ⚠️ 原因       : Drive F: not found           │
+│  🛑 操作       : 已阻止下载，未回退 C 盘       │
+│                                               │
+│  💡 请重新连接磁盘或修改下载目录               │
+└──────────────────────────────────────────────┘
+```
+
+> **核心原则：路径不可用 → 宁可阻止，绝不静默回退 C 盘。**
+
+---
+
+## 🚀 一键安装
+
+### 方式一：ClawHub（推荐）
+
 ```bash
 clawhub install download-guard
 ```
 
-**Option B: Manual**
-1. Download/clone this repository
-2. Copy the `download-guard` folder to `~/.workbuddy/skills/download-guard/`
+### 方式二：手动
 
-### First-Time Setup
+1. 下载或 clone 本仓库
+2. 复制 `download-guard` 文件夹到 `~/.workbuddy/skills/download-guard/`
+3. 下次触发下载时自动激活
 
-When the skill activates for the first time, it will automatically:
+---
 
-1. **Scan your disks** and recommend the best non-C: drive (largest free space)
-2. **Ask you to confirm** the download directory
-3. **Scan tool caches** on C: drive and offer to migrate them
-4. **Show a status card** when ready
+## 🎮 首次配置（全自动引导）
 
-Example first-time prompt:
+安装后第一次触发下载时，Skill 会自动：
+
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Download Guard · First-time Setup
+  🛡️ Download Guard · 首次配置
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Disk scan results:
+磁盘扫描结果：
 
-  F:  132 GB available  ← Recommended (most space)
-  E:   97 GB available
-  D:   39 GB available
-  C:   58 GB available  [System drive - Not recommended]
+  F:  132 GB 可用  ← 推荐（空间最大）
+  E:   97 GB 可用
+  D:   39 GB 可用
+  C:   58 GB 可用  [系统盘 - 不推荐]
 
-Suggested: F:\AI-Downloads
-Confirm? Or enter a different path:
+推荐：F:\AI-Downloads
+确认？或输入其他路径：
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Daily Usage
+确认后自动：创建目录 → 写入配置 → 扫描 C 盘缓存 → 输出状态卡
 
-Once configured, every download automatically:
-
-1. ✅ Checks disk space and path availability
-2. ✅ Detects duplicate downloads
-3. ✅ Shows you where the file is going
-4. ✅ Verifies the file landed correctly
-5. ✅ Logs the download with auto-cleanup
-
-**You don't need to do anything.** The guard runs automatically when:
-- `pip install`, `npm install -g`, `cargo install`, `go install`, `uv pip install`
-- `pnpm add -g`, `bun install -g`, `conda install`
-- `git clone`, `docker pull`, `ollama pull`, `huggingface-cli download`
-- `curl`, `wget`, `winget install`, `choco install`, `scoop install`
+**你只需要说一个路径，其他全自动。**
 
 ---
 
-## Commands
+## 🗣️ 口令速查
 
-Say any of these to your AI agent:
+对 AI Agent 说这些话即可触发对应功能：
 
-| Command | What Happens |
-|---------|-------------|
-| `"download log"` / `"下载日志"` | Show last 20 downloads |
-| `"scan cache"` / `"扫描缓存"` | Scan tool cache locations |
-| `"migrate cache"` / `"迁移缓存"` | Migrate C: drive caches to your download root |
-| `"disk space"` / `"磁盘空间"` | Check disk space |
-| `"where's my download"` / `"刚才下的在哪"` | Show last download location |
-| `"check path"` / `"检查路径"` | Verify download directory is healthy |
-| `"download guard version"` / `"下载版本"` | Show current version |
-| `"reset config"` / `"重置配置"` | Re-run first-time setup |
-| `"fix warnings"` / `"帮我修复"` | Auto-fix all warnings |
-| `"uninstall download guard"` | Show cleanup instructions |
-
----
-
-## Supported Package Managers & Tools
-
-| Tool | Trigger | What's Guarded |
-|------|---------|---------------|
-| pip | `pip install` | Cache location, site-packages |
-| uv | `uv pip install` | Cache location |
-| npm | `npm install -g` | Prefix + cache + PATH |
-| pnpm | `pnpm add -g` | Store location |
-| bun | `bun install -g` | Install location |
-| conda | `conda install` | Package cache + env dirs |
-| yarn | `yarn global add` | Cache location |
-| cargo | `cargo install` | CARGO_HOME + registry |
-| go | `go install` | GOPATH + module cache |
-| git | `git clone` | Clone destination |
-| Docker | `docker pull` | Image download |
-| Ollama | `ollama pull` | Model download |
-| HuggingFace | `huggingface-cli download` | Model/dataset download |
-| winget/choco/scoop | `winget install` etc. | Package download |
-| curl/wget | `curl` / `wget` | File download |
-
-> **Smart detection**: `pip install` inside an active virtual environment (venv) does NOT trigger the guard — venv installs are local and don't affect C: drive.
+| 说 | 干什么 |
+|----|--------|
+| `"下载了什么"` / `"download log"` | 查看最近 20 条下载记录 |
+| `"缓存在哪"` / `"scan cache"` | 扫描所有工具缓存位置 |
+| `"迁移缓存"` / `"migrate cache"` | 把 C 盘缓存一键迁走 |
+| `"磁盘空间"` / `"disk space"` | 查看磁盘空间 |
+| `"刚才下的在哪"` / `"where's my download"` | 看最近一次下载位置 |
+| `"检查路径"` / `"check path"` | 验证下载目录是否健康 |
+| `"帮我修复"` / `"fix warnings"` | 自动修复所有警告 |
+| `"修改下载目录"` / `"change download dir"` | 更换下载目录 |
+| `"下载版本"` / `"download guard version"` | 查看当前版本 |
+| `"重置配置"` / `"reset config"` | 重新走一遍首次配置 |
+| `"卸载 download guard"` | 显示清理说明 |
 
 ---
 
-## Configuration
+## 🔌 支持的工具
 
-Single file: `config.md` in the skill directory. Edit by hand or let the Agent manage it.
+安装这些工具时自动触发守护：
 
-| Parameter | Default | Meaning |
-|-----------|---------|---------|
-| `DOWNLOAD_ROOT` | *(set during setup)* | Where downloads go |
-| `SETUP_DONE` | `false` | Whether setup has been completed |
-| `MIN_FREE_GB` | `0.5` | Below this = BLOCK download |
-| `WARN_FREE_GB` | `2` | Below this = WARN but proceed |
-| `C_DRIVE_WARN_GB` | `5` | C: below this = extra warning |
-| `ALLOW_SPACE_IN_TOOL_PATH` | `false` | Allow spaces in npm/conda paths (dangerous) |
-| `EXEMPT_PATHS` | *(empty)* | Paths NOT guarded by this skill |
-| `LOG_RETENTION_DAYS` | `30` | Auto-archive entries older than this |
-| `LOG_ARCHIVE_MAX_MB` | `10` | Delete archives larger than this |
+| 类别 | 工具 |
+|------|------|
+| **Python** | `pip install` · `uv pip install` · `conda install` |
+| **Node.js** | `npm install -g` · `pnpm add -g` · `bun install -g` |
+| **Rust / Go** | `cargo install` · `go install` |
+| **版本控制** | `git clone` |
+| **AI 模型** | `ollama pull` · `huggingface-cli download` |
+| **容器** | `docker pull` |
+| **系统包** | `winget install` · `choco install` · `scoop install` |
+| **通用下载** | `curl` · `wget` |
 
-> Set `LOG_RETENTION_DAYS: 0` to disable log cleanup entirely.
+> 🧠 **智能识别**：在虚拟环境（venv）里的 `pip install` 不会触发 — 本地安装不影响 C 盘。
 
 ---
 
-## File Structure
+## ⚙️ 配置（一个文件，改了即时生效）
+
+文件位置：`~/.workbuddy/skills/download-guard/config.md`
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `DOWNLOAD_ROOT` | *(首次配置时设置)* | 下载目标目录 |
+| `MIN_FREE_GB` | `0.5` | 低于此值 = 阻止下载 |
+| `WARN_FREE_GB` | `2` | 低于此值 = 警告但继续 |
+| `C_DRIVE_WARN_GB` | `5` | C 盘低于此值 = 额外提醒 |
+| `LOG_RETENTION_DAYS` | `30` | 日志自动归档天数（设 `0` 永不清理） |
+| `LOG_ARCHIVE_MAX_MB` | `10` | 归档文件超过此大小自动删除 |
+
+---
+
+## 🔄 工作流程图
+
+```
+触发下载
+  │
+  ├─ ❌ 首次使用？ ──→ 引导配置（扫描磁盘→选路径→写配置→扫缓存）
+  │
+  ├─ 1️⃣ 读取配置 ──→ 验证配置完整性
+  │
+  ├─ 2️⃣ 路径分类 ──→ 缓存(A·安全) / 安装目录(B·需同步PATH) / 文件(C·安全)
+  │
+  ├─ 3️⃣ 重复检测 ──→ 已存在？→ 询问是否重新下载
+  │
+  ├─ 4️⃣ 可用性检查 ──→ 盘不存在/不可写 → 🚫 BLOCK（不走C盘）
+  │                  → 空间不足 → 🚫 BLOCK
+  │                  → 大文件警告 → ⚠️ WARN
+  │
+  ├─ 5️⃣ 告知用户 ──→ 文件名 + 路径 + 磁盘状态
+  │
+  ├─ 6️⃣ 执行下载
+  │
+  └─ 7️⃣ 验证+记录 ──→ 确认文件存在 → 写入日志（自动清理）→ 告知用户完成
+```
+
+---
+
+## 🧰 包含的脚本
+
+| 脚本 | 功能 |
+|------|------|
+| `scripts/check-space.ps1` | 磁盘空间 + 路径可用性校验（盘存在→可写→自动创建） |
+| `scripts/log-download.ps1` | 下载日志记录 + 自动归档清理 |
+| `scripts/scan-tool-cache.ps1` | 扫描 12+ 种工具缓存位置，标记 C 盘危险项 |
+| `scripts/migrate-cache.ps1` | 一键将 C 盘缓存迁移到指定盘 |
+
+---
+
+## 🏗️ 项目结构
 
 ```
 download-guard/
-├── SKILL.md              # Core rules (loaded when skill triggers)
-├── reference.md           # Detailed reference (loaded on demand)
-├── config.md              # User configuration (template: SETUP_DONE=false)
-├── CHANGELOG.md           # Version history
-├── LICENSE                 # MIT-0
-├── README.md               # This file
+├── SKILL.md                ← 核心规则（Agent 加载此文件）
+├── reference.md             ← 详细参考（按需加载）
+├── config.md                ← 用户配置（模板：SETUP_DONE=false）
+├── README.md                ← 本文件
+├── CHANGELOG.md             ← 版本历史
+├── LICENSE                  ← MIT-0
 └── scripts/
-    ├── check-space.ps1    # Disk space + path availability check
-    ├── log-download.ps1   # Download logging + auto cleanup
-    ├── scan-tool-cache.ps1 # Tool cache location scanner
-    └── migrate-cache.ps1  # One-click cache migration
+    ├── check-space.ps1      ← 磁盘空间 + 路径可用性校验
+    ├── log-download.ps1     ← 下载日志 + 自动清理
+    ├── scan-tool-cache.ps1  ← 缓存位置扫描
+    └── migrate-cache.ps1    ← 缓存迁移
 ```
 
 ---
 
-## Design Principles
+## ⚠️ 已知限制
 
-1. **Transparent, not silent** — Every download tells you where it goes and if your disk is healthy
-2. **Block, don't fallback** — If the configured path is unavailable, BLOCK rather than silently use C:
-3. **Rules, not questions** — Ask on first setup and environment changes; daily ops = inform only
-4. **Auto-clean, not accumulate** — Logs auto-archive; nothing grows forever
-5. **Smart, not noisy** — venv installs don't trigger; small files don't trigger; duplicate downloads get flagged
-
----
-
-## Known Limitations
-
-| Limitation | Details |
-|-----------|---------|
-| Windows only | PowerShell scripts; macOS/Linux not supported |
-| nvm-managed Node.js | nvm version switches may reset npm prefix to C: |
-| `pip install --user` | Installs to C: user site-packages — suggest using venv instead |
-| Docker image storage | `docker pull` images are managed by Docker Desktop (WSL2 VHDX) |
-| Build artifacts | `cmake build`, `cargo build` outputs not in scope |
-| System downloads | Windows Update / Defender not in scope |
+| 限制 | 说明 |
+|------|------|
+| 仅 Windows | 使用 PowerShell 脚本，不支持 macOS/Linux |
+| nvm 管理的 Node | nvm 切版本可能重置 npm prefix 到 C 盘 |
+| `pip install --user` | 装到 C 盘用户 site-packages — 建议用 venv |
+| Docker 镜像存储 | 由 Docker Desktop (WSL2 VHDX) 管理 |
+| 编译中间产物 | `cmake build`、`cargo build` 不在管辖范围 |
 
 ---
 
-## Requirements
+## 📜 版本历史
 
-- **Platform**: Windows (PowerShell 5.1+)
-- **Disk space**: At least 0.5 GB free on target drive
-- **Agent**: WorkBuddy / Claude Code with skill support
+详见 [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-## License
+## 📄 许可证
 
-MIT-0 — do whatever you want with it. See [LICENSE](LICENSE).
+MIT-0 — 随便用。详见 [LICENSE](LICENSE)
