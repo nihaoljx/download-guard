@@ -9,6 +9,8 @@ description: >
   huggingface-cli download, winget/choco/scoop install, curl/wget.
   Checks disk space, validates path availability, logs every download,
   prevents C-drive fill-up and broken-path fallback.
+  Use when: user runs pip install, npm install -g, git clone, docker pull, ollama pull, cargo install, go install, or any download/install command. Also use when user asks "where did it download", "disk space", "download log", "scan cache", "migrate cache".
+  NOT for: managing already-installed applications, uninstalling programs, or non-download file operations.
   Say "download guard" / "download guard status" / "where did it download" / "disk space" / "download guard version".
   当用户说"下载/安装/克隆/拉取模型/pull镜像/磁盘空间/下载到哪/下载版本"时自动激活。
 author: nihaoljx
@@ -22,6 +24,12 @@ triggers:
 agent_created: true
 tags: [download, disk-space, logging, guard, path-safety, windows]
 platform: windows
+metadata:
+  openclaw:
+    primaryEnv: ""
+    requires:
+      bins:
+        - powershell
 ---
 
 # Download Guard v5.4
