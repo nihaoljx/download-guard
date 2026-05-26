@@ -1,5 +1,6 @@
 ---
 name: download-guard
+slug: download-guard
 version: "5.4.0"
 description: >
   AI Agent download guard (Windows only). Auto-activates on: download, install, git clone,
@@ -10,6 +11,14 @@ description: >
   prevents C-drive fill-up and broken-path fallback.
   Say "download guard" / "download guard status" / "where did it download" / "disk space" / "download guard version".
   当用户说"下载/安装/克隆/拉取模型/pull镜像/磁盘空间/下载到哪/下载版本"时自动激活。
+author: nihaoljx
+license: MIT-0
+triggers:
+  - download guard
+  - download guard status
+  - where did it download
+  - disk space
+  - download guard version
 agent_created: true
 tags: [download, disk-space, logging, guard, path-safety, windows]
 platform: windows
